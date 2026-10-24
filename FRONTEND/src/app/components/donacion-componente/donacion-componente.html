@@ -1,0 +1,51 @@
+<div style="max-width: 600px; margin: 20px auto; font-family: Arial, sans-serif;">
+    <h2>Registro de Donaciones - Comedores Huancayo</h2>
+  
+    <form (submit)="guardar($event)" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+      <div>
+        <label for="item">Alimento / Recurso: </label>
+        <input type="text" id="item" [(ngModel)]="nuevaDonacion.item" name="item" required />
+      </div>
+  
+      <div>
+        <label for="cantidad">Cantidad (Kg): </label>
+        <input type="number" id="cantidad" [(ngModel)]="nuevaDonacion.cantidad_kg" name="cantidad_kg" required />
+      </div>
+  
+      <div>
+        <label for="comedor">Comedor Destino: </label>
+        <input type="text" id="comedor" [(ngModel)]="nuevaDonacion.comedor" name="comedor" required />
+      </div>
+  
+      <button type="submit" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; cursor: pointer;">
+        Guardar Donación
+      </button>
+    </form>
+  
+    <hr />
+  
+    <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background-color: #f2f2f2;">
+          <th>#</th>
+          <th>Item / Alimento</th>
+          <th>Cantidad (Kg)</th>
+          <th>Comedor Destino</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (donacion of listaDonaciones; track $index) {
+          <tr>
+            <td>{{ $index + 1 }}</td>
+            <td>{{ donacion.item }}</td>
+            <td>{{ donacion.cantidad_kg }}</td>
+            <td>{{ donacion.comedor }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" style="text-align: center;">No hay donaciones registradas aún.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>

@@ -1,0 +1,15 @@
+# Python / Backend
+**/venv/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node / Angular Frontend
+**/node_modules/
+**/.angular/
+**/dist/
+
+# Editor / Sistema
+.vscode/
+.DS_Store
+Thumbs.db
