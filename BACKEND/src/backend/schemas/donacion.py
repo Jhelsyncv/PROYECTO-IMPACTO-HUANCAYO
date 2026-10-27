@@ -8,8 +8,9 @@ class DonacionBase(BaseModel):
 class DonacionCrear(DonacionBase):
     pass
 
-class Donacion(DonacionBase):
+class DonacionSchema(DonacionBase):
     id: int
 
     class Config:
         from_attributes = True
+

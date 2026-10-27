@@ -9,7 +9,7 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "src/app/components/donacion-componente/donacion-componente.ts"  ],
   "exclude": [
     "src/**/*.spec.ts"
   ]
