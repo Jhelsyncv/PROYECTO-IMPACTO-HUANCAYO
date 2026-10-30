@@ -6,13 +6,15 @@ from fastapi import HTTPException, status
 class DonacionServicio:
 
     def obtener_todas(self, db: Session):
-        return db.query(DonacionDB).all()
+        return db.query(DonacionDB).order_by(DonacionDB.id.desc()).all()
 
     def crear_donacion(self, db: Session, donacion: DonacionCrear):
         nueva_donacion = DonacionDB(
             item=donacion.item,
             cantidad_kg=donacion.cantidad_kg,
-            comedor=donacion.comedor
+            comedor=donacion.comedor,
+            categoria=donacion.categoria or "Otros",
+            donante=donacion.donante or "Anónimo"
         )
         db.add(nueva_donacion)
         db.commit()
@@ -27,6 +29,8 @@ class DonacionServicio:
         donacion_existente.item = datos.item
         donacion_existente.cantidad_kg = datos.cantidad_kg
         donacion_existente.comedor = datos.comedor
+        donacion_existente.categoria = datos.categoria or "Otros"
+        donacion_existente.donante = datos.donante or "Anónimo"
         
         db.commit()
         db.refresh(donacion_existente)
