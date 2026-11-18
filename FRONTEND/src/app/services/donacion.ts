@@ -1,16 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Donacion } from '../interfaces/donacion';
 
-export interface Donacion {
-  id?: number;
-  item: string;
-  cantidad_kg: number;
-  comedor: string;
-  categoria?: string;
-  donante?: string;
-  fecha_registro?: string;
-}
+export type { Donacion };
 
 @Injectable({
   providedIn: 'root'
