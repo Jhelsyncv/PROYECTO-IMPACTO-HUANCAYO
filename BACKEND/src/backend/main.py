@@ -20,16 +20,19 @@ if sys.version_info < (3, 10):
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
+import models  # Descubre e importa todos los modelos SQLAlchemy (3FN)
 from apis.donacion_api import router as donacion_router
+from apis.comedor_api import router as comedor_router
+from apis.categoria_api import router as categoria_router
 from routers.auth_router import router as auth_router
 
-# 1. Crear las tablas en PostgreSQL si no existen
+# 1. Crear las tablas normalizadas en PostgreSQL si no existen
 Base.metadata.create_all(bind=engine)
 
-# 2. Instanciar la aplicación FastAPI con metadatos descriptivos para OpenAPI/Swagger
+# 2. Instanciar la aplicación FastAPI con metadatos descriptivos
 app = FastAPI(
     title="API AlimentaHuancayo - Comedores Populares",
-    description="API REST para el registro, seguimiento y administración de donaciones alimentarias.",
+    description="API REST normalizada en 3FN para la gestión de donaciones e insumos alimenticios.",
     version="1.0.0"
 )
 
@@ -50,9 +53,12 @@ def estado_api():
         "proyecto": "AlimentaHuancayo - Comedores Populares",
         "estado": "En línea y operativo",
         "version": "1.0.0",
+        "base_de_datos": "PostgreSQL 3FN",
         "documentacion": "/docs"
     }
 
 # 5. Incluir los Routers modulares
 app.include_router(auth_router)
 app.include_router(donacion_router)
+app.include_router(comedor_router)
+app.include_router(categoria_router)
