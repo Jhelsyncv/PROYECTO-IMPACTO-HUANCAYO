@@ -1,6 +1,6 @@
 # Sistema de Gestión de Donaciones - Comedores Populares de Huancayo (AlimentaHuancayo)
 
-Plataforma web full-stack orientada a la administración, seguimiento estadístico y control en tiempo real de donaciones de insumos alimenticios para comedores populares en la provincia de Huancayo, Perú.
+Plataforma web orientada a la administración, seguimiento estadístico y control en tiempo real de donaciones de insumos alimenticios para comedores populares en la provincia de Huancayo, Perú.
 
 ---
 
