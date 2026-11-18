@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DonacionService, Donacion } from '../../services/donacion';
+import { ComedorService, Comedor } from '../../services/comedor';
 import { AuthService } from '../../services/auth';
 
 declare var XLSX: any;
@@ -17,6 +18,7 @@ declare var Chart: any;
 })
 export class DonacionComponente implements OnInit {
   private donacionService = inject(DonacionService);
+  private comedorService = inject(ComedorService);
   private authService = inject(AuthService);
 
   // Variables de Autenticación
@@ -45,6 +47,28 @@ export class DonacionComponente implements OnInit {
 
   formularioEnviado: boolean = false;
 
+  // Gestión de Comedores Populares (3FN)
+  listaComedores: Comedor[] = [];
+  cargandoComedores: boolean = false;
+  distritosHuancayo: string[] = [
+    'Huancayo Centro',
+    'El Tambo',
+    'Chilca',
+    'Pilcomayo',
+    'Huancán',
+    'San Jerónimo de Tunán',
+    'Sapallanga',
+    'Sicaya'
+  ];
+  nuevoComedor: Comedor = {
+    nombre: '',
+    distrito: 'Huancayo Centro',
+    direccion: '',
+    responsable: '',
+    telefono: ''
+  };
+  formularioComedorEnviado: boolean = false;
+
   // Filtros y Estados
   busqueda: string = '';
   fechaInicio: string = '';
@@ -65,6 +89,7 @@ export class DonacionComponente implements OnInit {
 
   ngOnInit(): void {
     this.cargarDonaciones();
+    this.cargarComedores();
   }
 
   // --- MÉTODOS DE AUTENTICACIÓN ---
@@ -97,8 +122,56 @@ export class DonacionComponente implements OnInit {
     this.mostrarNotificacion('Sesión cerrada correctamente');
   }
 
+  // --- MÉTODOS DE GESTIÓN DE COMEDORES (3FN) ---
+  cargarComedores(): void {
+    this.cargandoComedores = true;
+    this.comedorService.obtenerComedores().subscribe({
+      next: (data) => {
+        this.listaComedores = data;
+        this.cargandoComedores = false;
+      },
+      error: () => {
+        this.cargandoComedores = false;
+      }
+    });
+  }
+
+  guardarComedor(evento: Event): void {
+    evento.preventDefault();
+    this.formularioComedorEnviado = true;
+
+    if (!this.nuevoComedor.nombre.trim()) {
+      this.mostrarNotificacion('Por favor ingrese el nombre del comedor popular', true);
+      return;
+    }
+
+    this.comedorService.crearComedor(this.nuevoComedor).subscribe({
+      next: (creado) => {
+        this.mostrarNotificacion(`Comedor "${creado.nombre}" registrado exitosamente en el sistema`);
+        this.formularioComedorEnviado = false;
+        this.nuevoComedor = {
+          nombre: '',
+          distrito: 'Huancayo Centro',
+          direccion: '',
+          responsable: '',
+          telefono: ''
+        };
+        this.cargarComedores();
+        if (!this.nuevaDonacion.comedor) {
+          this.nuevaDonacion.comedor = creado.nombre;
+        }
+      },
+      error: () => {
+        this.mostrarNotificacion('Error al registrar comedor. Requiere iniciar sesión como administrador.', true);
+      }
+    });
+  }
+
   // --- MÉTODOS DE NEGOCIO Y MÉTRICAS DINÁMICAS ---
   get totalComedoresUnicos(): number {
+    if (this.listaComedores.length > 0) {
+      return this.listaComedores.length;
+    }
     const comedores = this.listaDonaciones.map(d => d.comedor?.trim().toLowerCase()).filter(Boolean);
     return new Set(comedores).size;
   }
@@ -261,6 +334,7 @@ export class DonacionComponente implements OnInit {
           this.mostrarNotificacion('Donación actualizada correctamente');
           this.limpiarFormulario();
           this.cargarDonaciones();
+          this.cargarComedores();
         },
         error: () => this.mostrarNotificacion('Error al actualizar la donación. Requiere iniciar sesión.', true)
       });
@@ -270,6 +344,7 @@ export class DonacionComponente implements OnInit {
           this.mostrarNotificacion('Donación registrada con éxito');
           this.limpiarFormulario();
           this.cargarDonaciones();
+          this.cargarComedores();
         },
         error: () => this.mostrarNotificacion('Error al guardar la donación. Requiere iniciar sesión.', true)
       });
