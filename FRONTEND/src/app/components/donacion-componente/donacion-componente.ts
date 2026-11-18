@@ -12,7 +12,8 @@ declare var Chart: any;
   selector: 'app-donaciones',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './donacion-componente.html'
+  templateUrl: './donacion-componente.html',
+  styleUrl: './donacion-componente.css'
 })
 export class DonacionComponente implements OnInit {
   private donacionService = inject(DonacionService);
@@ -24,22 +25,32 @@ export class DonacionComponente implements OnInit {
 
   // Lista y Formulario de Donaciones
   listaDonaciones: Donacion[] = [];
-  categorias: string[] = ['Granos y Cereales', 'Lácteos', 'Cárnicos', 'Verduras y Frutas', 'Abarrotes', 'Otros'];
-  
-  nuevaDonacion: Donacion = { 
-    item: '', 
-    cantidad_kg: 0, 
-    comedor: '', 
-    categoria: 'Granos y Cereales', 
-    donante: '' 
+  categorias: string[] = [
+    'Granos y Cereales',
+    'Lácteos',
+    'Cárnicos',
+    'Verduras y Frutas',
+    'Abarrotes',
+    'Líquidos y Bebidas',
+    'Otros'
+  ];
+
+  nuevaDonacion: Donacion = {
+    item: '',
+    cantidad_kg: 0,
+    comedor: '',
+    categoria: 'Granos y Cereales',
+    donante: ''
   };
-  
+
+  formularioEnviado: boolean = false;
+
   // Filtros y Estados
   busqueda: string = '';
   fechaInicio: string = '';
   fechaFin: string = '';
   cargando: boolean = false;
-  
+
   // Paginación
   paginaActual: number = 1;
   elementosPorPagina: number = 5;
@@ -86,25 +97,35 @@ export class DonacionComponente implements OnInit {
     this.mostrarNotificacion('Sesión cerrada correctamente');
   }
 
-  // --- MÉTODOS DE NEGOCIO ---
+  // --- MÉTODOS DE NEGOCIO Y MÉTRICAS DINÁMICAS ---
+  get totalComedoresUnicos(): number {
+    const comedores = this.listaDonaciones.map(d => d.comedor?.trim().toLowerCase()).filter(Boolean);
+    return new Set(comedores).size;
+  }
+
+  get totalDonantesUnicos(): number {
+    const donantes = this.listaDonaciones.map(d => d.donante?.trim().toLowerCase()).filter(Boolean);
+    return new Set(donantes).size || (this.listaDonaciones.length > 0 ? 1 : 0);
+  }
+
   get donacionesFiltradas(): Donacion[] {
     return this.listaDonaciones.filter(d => {
       const termino = this.busqueda.toLowerCase().trim();
-      const coincideTexto = !termino || 
-        d.item.toLowerCase().includes(termino) || 
+      const coincideTexto = !termino ||
+        d.item.toLowerCase().includes(termino) ||
         d.comedor.toLowerCase().includes(termino) ||
         (d.categoria && d.categoria.toLowerCase().includes(termino)) ||
         (d.donante && d.donante.toLowerCase().includes(termino));
 
       let coincideFecha = true;
       if (d.fecha_registro) {
-        const fechaReg = new Date(d.fecha_registro).setHours(0,0,0,0);
+        const fechaReg = new Date(d.fecha_registro).setHours(0, 0, 0, 0);
         if (this.fechaInicio) {
-          const inicio = new Date(this.fechaInicio).setHours(0,0,0,0);
+          const inicio = new Date(this.fechaInicio).setHours(0, 0, 0, 0);
           coincideFecha = coincideFecha && (fechaReg >= inicio);
         }
         if (this.fechaFin) {
-          const fin = new Date(this.fechaFin).setHours(23,59,59,999);
+          const fin = new Date(this.fechaFin).setHours(23, 59, 59, 999);
           coincideFecha = coincideFecha && (fechaReg <= fin);
         }
       }
@@ -120,6 +141,10 @@ export class DonacionComponente implements OnInit {
 
   get totalPaginas(): number {
     return Math.ceil(this.donacionesFiltradas.length / this.elementosPorPagina) || 1;
+  }
+
+  get paginasArray(): number[] {
+    return Array.from({ length: this.totalPaginas }, (_, i) => i + 1);
   }
 
   get totalKg(): number {
@@ -185,14 +210,17 @@ export class DonacionComponente implements OnInit {
         data: {
           labels: Object.keys(resumenCategoria),
           datasets: [{
-            label: 'Kilogramos (Kg)',
+            label: 'Cantidad (Kg / L)',
             data: Object.values(resumenCategoria),
-            backgroundColor: 'rgba(13, 110, 253, 0.7)',
-            borderColor: 'rgb(13, 110, 253)',
+            backgroundColor: 'rgba(25, 135, 84, 0.85)',
+            borderColor: '#198754',
             borderWidth: 1
           }]
         },
-        options: { responsive: true, plugins: { legend: { display: false } } }
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } }
+        }
       });
     }
 
@@ -205,7 +233,7 @@ export class DonacionComponente implements OnInit {
           labels: Object.keys(resumenComedor),
           datasets: [{
             data: Object.values(resumenComedor),
-            backgroundColor: ['#0d6efd', '#20c997', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14']
+            backgroundColor: ['#198754', '#0d6efd', '#0dcaf0', '#ffc107', '#fd7e14', '#6c757d']
           }]
         },
         options: { responsive: true }
@@ -215,14 +243,15 @@ export class DonacionComponente implements OnInit {
 
   guardar(evento: Event): void {
     evento.preventDefault();
+    this.formularioEnviado = true;
 
     if (!this.nuevaDonacion.item.trim() || !this.nuevaDonacion.comedor.trim()) {
-      this.mostrarNotificacion('Por favor complete el alimento y el comedor', true);
+      this.mostrarNotificacion('Por favor complete todos los campos obligatorios (*)', true);
       return;
     }
 
     if (this.nuevaDonacion.cantidad_kg <= 0) {
-      this.mostrarNotificacion('La cantidad en Kg debe ser mayor a 0', true);
+      this.mostrarNotificacion('La cantidad (Kg / L) debe ser mayor a 0', true);
       return;
     }
 
@@ -251,6 +280,7 @@ export class DonacionComponente implements OnInit {
     if (donacion.id !== undefined) {
       this.editandoId = donacion.id;
       this.nuevaDonacion = { ...donacion };
+      this.formularioEnviado = false;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
@@ -273,12 +303,13 @@ export class DonacionComponente implements OnInit {
 
   limpiarFormulario(): void {
     this.editandoId = null;
-    this.nuevaDonacion = { 
-      item: '', 
-      cantidad_kg: 0, 
-      comedor: '', 
-      categoria: 'Granos y Cereales', 
-      donante: '' 
+    this.formularioEnviado = false;
+    this.nuevaDonacion = {
+      item: '',
+      cantidad_kg: 0,
+      comedor: '',
+      categoria: 'Granos y Cereales',
+      donante: ''
     };
   }
 
@@ -287,7 +318,7 @@ export class DonacionComponente implements OnInit {
       '#': index + 1,
       'Artículo / Alimento': d.item,
       'Categoría': d.categoria || 'Otros',
-      'Cantidad (Kg)': d.cantidad_kg,
+      'Cantidad (Kg / L)': d.cantidad_kg,
       'Comedor Destino': d.comedor,
       'Donante': d.donante || 'Anónimo',
       'Fecha': d.fecha_registro ? new Date(d.fecha_registro).toLocaleDateString('es-PE') : '-'
@@ -310,7 +341,7 @@ export class DonacionComponente implements OnInit {
       index + 1,
       d.item,
       d.categoria || 'Otros',
-      `${d.cantidad_kg} kg`,
+      `${d.cantidad_kg} Kg / L`,
       d.comedor,
       d.donante || 'Anónimo'
     ]);
@@ -320,7 +351,7 @@ export class DonacionComponente implements OnInit {
       body: filas,
       startY: 35,
       theme: 'striped',
-      headStyles: { fillColor: [13, 110, 253] }
+      headStyles: { fillColor: [25, 135, 84] }
     });
 
     doc.save('Reporte_Donaciones_Huancayo.pdf');
