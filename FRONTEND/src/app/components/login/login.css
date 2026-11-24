@@ -1,0 +1,467 @@
+/* ==============================================================
+   CONTENEDOR SPLIT SCREEN (Basado fielmente en la imagen de diseño)
+   ============================================================== */
+.login-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #ffffff;
+}
+
+/* LADO IZQUIERDO: Branding Verde Bosque Huancayo */
+.login-left {
+  flex: 0 0 45%;
+  max-width: 45%;
+  background-color: #0e4429;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  color: #ffffff;
+  position: relative;
+}
+
+.brand-content {
+  max-width: 380px;
+  text-align: center;
+  margin: auto;
+}
+
+/* Badge circular blanco con corazón verde */
+.brand-badge {
+  width: 86px;
+  height: 86px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.heart-icon {
+  width: 44px;
+  height: 44px;
+  display: block;
+}
+
+.brand-title {
+  font-size: 2.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.5px;
+}
+
+.brand-subtitle {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #f1f5f9;
+  margin-bottom: 4.5rem;
+}
+
+.brand-description p {
+  font-size: 0.925rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  margin-bottom: 0;
+}
+
+/* LADO DERECHO: Formulario Limpio Blanco */
+.login-right {
+  flex: 0 0 55%;
+  max-width: 55%;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2.5rem;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.form-header {
+  margin-bottom: 2rem;
+}
+
+.form-title {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.35rem;
+}
+
+.form-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-bottom: 0;
+}
+
+/* ==============================================================
+   CAMPOS DE ENTRADA CON ICONOS (Exactos a la imagen)
+   ============================================================== */
+.input-field {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field:focus-within {
+  border-color: #0e753d;
+  box-shadow: 0 0 0 3px rgba(14, 117, 61, 0.15);
+}
+
+/* Estado de error y animación Shake */
+.input-field.input-error {
+  border-color: #dc2626 !important;
+  background-color: #fffafb;
+}
+
+.input-field.input-error:focus-within {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+@keyframes shakeField {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+.shake-error {
+  animation: shakeField 0.35s ease-in-out;
+}
+
+/* Advertencia de Bloq Mayús */
+.caps-warning {
+  color: #b45309;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background-color: #fef3c7;
+  border-radius: 6px;
+  animation: fadeInModal 0.2s ease-out;
+}
+
+/* Medidor de contraseña */
+.password-meter-box {
+  background: #f8fafc;
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.meter-bar-track {
+  height: 4px;
+  background-color: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.meter-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.fill-weak {
+  background-color: #ef4444;
+}
+
+.fill-medium {
+  background-color: #f59e0b;
+}
+
+.fill-strong {
+  background-color: #10b981;
+}
+
+.input-icon {
+  color: #64748b;
+  font-size: 1.15rem;
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.form-input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background-color: transparent;
+}
+
+.form-input::placeholder {
+  color: #94a3b8;
+}
+
+.btn-toggle-eye {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+
+.btn-toggle-eye:hover {
+  color: #0e753d;
+}
+
+/* ==============================================================
+   OPCIONES Y BOTONES
+   ============================================================== */
+.options-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.remember-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-label input[type="checkbox"] {
+  accent-color: #0e753d;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.forgot-link {
+  color: #0e753d;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: #0b5e31;
+  text-decoration: underline;
+}
+
+/* Botón Verde Sólido: Ingresar */
+.btn-primary-green {
+  width: 100%;
+  background-color: #0e753d;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary-green:hover:not(:disabled) {
+  background-color: #0a5c2f;
+}
+
+.btn-primary-green:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-primary-green:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+/* Separador con 'o' */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 1.35rem 0;
+}
+
+.divider-line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: #e2e8f0;
+}
+
+.divider-text {
+  padding: 0 0.85rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+/* Botón Outline Verde: Crear una cuenta */
+.btn-outline-green {
+  width: 100%;
+  background-color: transparent;
+  color: #0e753d;
+  border: 1.5px solid #0e753d;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-outline-green:hover {
+  background-color: #f0fdf4;
+  color: #0a5c2f;
+  border-color: #0a5c2f;
+}
+
+/* ==============================================================
+   ALERTAS
+   ============================================================== */
+.alert-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.alert-success {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.btn-close-alert {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.btn-close-alert:hover {
+  opacity: 1;
+}
+
+/* ==============================================================
+   MODAL PERSONALIZADO (¿Olvidaste tu contraseña?)
+   ============================================================== */
+.modal-backdrop-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+  backdrop-filter: blur(2px);
+}
+
+.modal-card-custom {
+  background-color: #ffffff;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-header-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.btn-close-modal {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.modal-body-custom {
+  padding: 1.5rem;
+}
+
+.modal-footer-custom {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ==============================================================
+   RESPONSIVIDAD (Móviles y Tablets)
+   ============================================================== */
+@media (max-width: 991px) {
+  .login-wrapper {
+    flex-direction: column;
+  }
+
+  .login-left {
+    flex: none;
+    max-width: 100%;
+    padding: 2.5rem 1.5rem;
+  }
+
+  .brand-subtitle {
+    margin-bottom: 1.5rem;
+  }
+
+  .login-right {
+    flex: 1;
+    max-width: 100%;
+    padding: 2.5rem 1.5rem;
+  }
+}

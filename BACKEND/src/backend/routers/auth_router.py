@@ -26,6 +26,25 @@ class TokenResponseSchema(BaseModel):
     token_type: str = "bearer"
     usuario: UsuarioInfoSchema
 
+class RecuperarPasswordSchema(BaseModel):
+    email: EmailStr = Field(..., description="Correo electrónico registrado del usuario")
+
+@router.post("/recuperar-password")
+def recuperar_password(datos: RecuperarPasswordSchema, db: Session = Depends(get_db)):
+    """
+    Solicita el restablecimiento de contraseña.
+    Siguiendo las directrices de seguridad OWASP para evitar enumeración de usuarios,
+    siempre se devuelve una respuesta genérica y segura independientemente de si el correo existe.
+    """
+    email_limpio = datos.email.lower().strip()
+    usuario = db.query(UsuarioDB).filter(UsuarioDB.email == email_limpio).first()
+
+    # En un entorno con servicio de correo SMTP configurado, aquí se generaría un token
+    # criptográfico temporal y se enviaría el enlace de restablecimiento al correo.
+    return {
+        "mensaje": "Si el correo electrónico se encuentra registrado en el sistema, se han enviado las instrucciones de restablecimiento de contraseña."
+    }
+
 @router.post("/registro", status_code=status.HTTP_201_CREATED)
 def registrar_usuario(datos: RegistroSchema, db: Session = Depends(get_db)):
     """Registra un nuevo usuario en la base de datos con contraseña encriptada."""
