@@ -1,0 +1,326 @@
+<div class="login-wrapper">
+  <!-- LADO IZQUIERDO: Branding AlimentaHuancayo (Verde Oscuro) -->
+  <div class="login-left">
+    <div class="brand-content">
+      <!-- Icono circular blanco con corazón verde idéntico a la imagen -->
+      <div class="brand-badge">
+        <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="#0e5c36" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </div>
+
+      <h1 class="brand-title">AlimentaHuancayo</h1>
+      <p class="brand-subtitle">Juntos contra el hambre</p>
+
+      <div class="brand-description">
+        <p>Plataforma de donación de alimentos<br>para los comedores populares de Huancayo.<br>Tu apoyo hace la diferencia.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LADO DERECHO: Formulario Blanco (Login y Registro) -->
+  <div class="login-right">
+    <div class="form-container">
+      
+      <!-- Notificación / Alerta -->
+      <div *ngIf="mensaje" class="alert-box" [ngClass]="esError ? 'alert-error' : 'alert-success'">
+        <i class="bi" [ngClass]="esError ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill'"></i>
+        <span>{{ mensaje }}</span>
+        <button type="button" class="btn-close-alert" (click)="cerrarAlerta()" aria-label="Cerrar">&times;</button>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- VISTA 1: INICIAR SESIÓN (DISEÑO DE LA IMAGEN) -->
+      <!-- ============================================== -->
+      <ng-container *ngIf="modo === 'login'">
+        <div class="form-header">
+          <h2 class="form-title">Iniciar sesión</h2>
+          <p class="form-subtitle">Accede a tu cuenta para continuar</p>
+        </div>
+
+        <form (submit)="iniciarSesion($event)" novalidate>
+          <!-- Campo 1: Correo Electrónico con icono envelope -->
+          <div class="input-field mb-3" [class.input-error]="errorLogin" [class.shake-error]="errorLogin">
+            <span class="input-icon">
+              <i class="bi bi-envelope"></i>
+            </span>
+            <input 
+              type="email" 
+              class="form-input" 
+              placeholder="Correo electrónico" 
+              [(ngModel)]="loginEmail" 
+              name="loginEmail" 
+              autocomplete="email"
+              (input)="onInputModificado()"
+              required>
+          </div>
+
+          <!-- Campo 2: Contraseña con icono lock y toggle eye -->
+          <div class="input-field mb-2" [class.input-error]="errorLogin" [class.shake-error]="errorLogin">
+            <span class="input-icon">
+              <i class="bi bi-lock"></i>
+            </span>
+            <input 
+              id="loginPassField"
+              [type]="mostrarPasswordLogin ? 'text' : 'password'" 
+              class="form-input" 
+              placeholder="Contraseña" 
+              [(ngModel)]="loginPassword" 
+              name="loginPassword" 
+              autocomplete="current-password"
+              (input)="onInputModificado()"
+              (keyup)="verificarBloqMayus($event)"
+              (keydown)="verificarBloqMayus($event)"
+              required>
+            <button type="button" class="btn-toggle-eye" (click)="togglePasswordLogin()" [title]="mostrarPasswordLogin ? 'Ocultar contraseña' : 'Ver contraseña'">
+              <i class="bi" [ngClass]="mostrarPasswordLogin ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+
+          <!-- Aviso de Bloq Mayús activo -->
+          <div *ngIf="bloqMayusActivo" class="caps-warning mb-2">
+            <i class="bi bi-capslock-fill me-1"></i> Bloq Mayús está activado
+          </div>
+
+          <!-- Fila: Recordarme y ¿Olvidaste tu contraseña? -->
+          <div class="options-row mb-4">
+            <label class="remember-label">
+              <input type="checkbox" [(ngModel)]="recordarme" name="recordarme">
+              <span>Recordarme</span>
+            </label>
+
+            <a href="javascript:void(0)" class="forgot-link" (click)="abrirModalOlvido()">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+
+          <!-- Botón Principal: Ingresar (Verde Sólido) -->
+          <button type="submit" class="btn-primary-green" [disabled]="cargando">
+            <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {{ cargando ? 'Ingresando...' : 'Ingresar' }}
+          </button>
+
+          <!-- Separador con 'o' -->
+          <div class="divider">
+            <span class="divider-line"></span>
+            <span class="divider-text">o</span>
+            <span class="divider-line"></span>
+          </div>
+
+          <!-- Botón Secundario: Crear una cuenta (Verde Outline) -->
+          <button type="button" class="btn-outline-green" (click)="cambiarModo('registro')">
+            Crear una cuenta
+          </button>
+        </form>
+      </ng-container>
+
+      <!-- ============================================== -->
+      <!-- VISTA 2: CREAR UNA CUENTA (REGISTRO COMPLETO) -->
+      <!-- ============================================== -->
+      <ng-container *ngIf="modo === 'registro'">
+        <div class="form-header">
+          <h2 class="form-title">Crear una cuenta</h2>
+          <p class="form-subtitle">Regístrate para colaborar con los comedores populares</p>
+        </div>
+
+        <form (submit)="registrarUsuario($event)" novalidate>
+          <!-- Campo: Nombre Completo -->
+          <div class="input-field mb-3">
+            <span class="input-icon">
+              <i class="bi bi-person"></i>
+            </span>
+            <input 
+              type="text" 
+              class="form-input" 
+              placeholder="Nombre y Apellidos completos" 
+              [(ngModel)]="registroNombre" 
+              name="registroNombre" 
+              required>
+          </div>
+
+          <!-- Campo: Correo Electrónico -->
+          <div class="input-field mb-3">
+            <span class="input-icon">
+              <i class="bi bi-envelope"></i>
+            </span>
+            <input 
+              type="email" 
+              class="form-input" 
+              placeholder="Correo electrónico institucional o personal" 
+              [(ngModel)]="registroEmail" 
+              name="registroEmail" 
+              required>
+          </div>
+
+          <!-- Campo: Contraseña -->
+          <div class="input-field mb-2">
+            <span class="input-icon">
+              <i class="bi bi-lock"></i>
+            </span>
+            <input 
+              [type]="mostrarPasswordRegistro ? 'text' : 'password'" 
+              class="form-input" 
+              placeholder="Contraseña (mínimo 6 caracteres)" 
+              [(ngModel)]="registroPassword" 
+              name="registroPassword" 
+              (input)="evaluarFuerzaPassword()"
+              required>
+            <button type="button" class="btn-toggle-eye" (click)="togglePasswordRegistro()" [title]="mostrarPasswordRegistro ? 'Ocultar' : 'Ver'">
+              <i class="bi" [ngClass]="mostrarPasswordRegistro ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+
+          <!-- Medidor de seguridad de contraseña -->
+          <div *ngIf="registroPassword" class="password-meter-box mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <span class="text-muted" style="font-size: 11px;">Seguridad de la clave:</span>
+              <span class="fw-bold" style="font-size: 11px;" [ngClass]="fuerzaPasswordNivel === 1 ? 'text-danger' : (fuerzaPasswordNivel === 2 ? 'text-warning' : 'text-success')">
+                {{ fuerzaPasswordTexto }}
+              </span>
+            </div>
+            <div class="meter-bar-track">
+              <div class="meter-bar-fill" [ngClass]="fuerzaPasswordNivel === 1 ? 'fill-weak' : (fuerzaPasswordNivel === 2 ? 'fill-medium' : 'fill-strong')" [style.width]="(fuerzaPasswordNivel * 33.3) + '%'"></div>
+            </div>
+          </div>
+
+          <!-- Campo: Confirmar Contraseña -->
+          <div class="input-field mb-1">
+            <span class="input-icon">
+              <i class="bi bi-shield-lock"></i>
+            </span>
+            <input 
+              [type]="mostrarConfirmarPasswordRegistro ? 'text' : 'password'" 
+              class="form-input" 
+              placeholder="Confirmar contraseña" 
+              [(ngModel)]="registroConfirmarPassword" 
+              name="registroConfirmarPassword" 
+              required>
+            <button type="button" class="btn-toggle-eye" (click)="toggleConfirmarPasswordRegistro()" [title]="mostrarConfirmarPasswordRegistro ? 'Ocultar' : 'Ver'">
+              <i class="bi" [ngClass]="mostrarConfirmarPasswordRegistro ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+
+          <!-- Indicador de coincidencia -->
+          <div *ngIf="registroConfirmarPassword" class="mb-3">
+            <small *ngIf="registroPassword !== registroConfirmarPassword" class="text-danger" style="font-size: 11.5px;">
+              <i class="bi bi-x-circle-fill me-1"></i> Las contraseñas no coinciden
+            </small>
+            <small *ngIf="registroPassword === registroConfirmarPassword" class="text-success" style="font-size: 11.5px;">
+              <i class="bi bi-check-circle-fill me-1"></i> Las contraseñas coinciden correctamente
+            </small>
+          </div>
+
+          <!-- Checkbox Términos -->
+          <div class="options-row mb-4">
+            <label class="remember-label">
+              <input type="checkbox" [(ngModel)]="registroAceptaTerminos" name="registroAceptaTerminos">
+              <span class="small">Acepto los términos de uso y compromiso de AlimentaHuancayo</span>
+            </label>
+          </div>
+
+          <!-- Botón Principal: Registrarse -->
+          <button type="submit" class="btn-primary-green" [disabled]="cargando">
+            <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {{ cargando ? 'Registrando usuario...' : 'Crear cuenta' }}
+          </button>
+
+          <!-- Separador con 'o' -->
+          <div class="divider">
+            <span class="divider-line"></span>
+            <span class="divider-text">o</span>
+            <span class="divider-line"></span>
+          </div>
+
+          <!-- Botón Secundario: Volver a Iniciar Sesión -->
+          <button type="button" class="btn-outline-green" (click)="cambiarModo('login')">
+            ¿Ya tienes una cuenta? Iniciar sesión
+          </button>
+        </form>
+      </ng-container>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- MODAL: RECUPERACIÓN SEGURA DE CONTRASEÑA -->
+<!-- ============================================== -->
+<div *ngIf="mostrarModalOlvido" class="modal-backdrop-custom" (click)="cerrarModalOlvido()">
+  <div class="modal-card-custom" (click)="$event.stopPropagation()">
+    <div class="modal-header-custom">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-shield-lock-fill text-success fs-4 me-2"></i>
+        <h5 class="fw-bold mb-0">Recuperar Contraseña</h5>
+      </div>
+      <button type="button" class="btn-close-modal" (click)="cerrarModalOlvido()">&times;</button>
+    </div>
+
+    <div class="modal-body-custom">
+      <!-- Estado 1: Formulario de Solicitud de Recuperación -->
+      <ng-container *ngIf="!recuperacionEnviada">
+        <p class="text-secondary small mb-3">
+          Ingresa tu correo electrónico registrado y te enviaremos las instrucciones para restablecer tu acceso de forma segura.
+        </p>
+
+        <!-- Alerta de validación en modal -->
+        <div *ngIf="mensajeRecuperacion" class="alert-box alert-error mb-3">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ mensajeRecuperacion }}</span>
+        </div>
+
+        <form (submit)="enviarRecuperacion($event)">
+          <div class="input-field mb-3">
+            <span class="input-icon">
+              <i class="bi bi-envelope"></i>
+            </span>
+            <input 
+              type="email" 
+              class="form-input" 
+              placeholder="tu-correo@ejemplo.com" 
+              [(ngModel)]="recuperarEmail" 
+              name="recuperarEmail" 
+              required>
+          </div>
+
+          <button type="submit" class="btn-primary-green w-100" [disabled]="cargandoRecuperacion">
+            <span *ngIf="cargandoRecuperacion" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {{ cargandoRecuperacion ? 'Enviando solicitud...' : 'Enviar instrucciones' }}
+          </button>
+        </form>
+
+        <div class="info-contact-card p-3 rounded-3 mt-4 bg-light border">
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-headset text-success fs-5 me-2"></i>
+            <span class="fw-semibold small text-dark">¿Necesitas asistencia adicional?</span>
+          </div>
+          <p class="text-muted small mb-0 ps-4">
+            Puedes acudir presencialmente a la Administración de Comedores Populares de Huancayo con tu documento de identidad para validar tu acceso.
+          </p>
+        </div>
+      </ng-container>
+
+      <!-- Estado 2: Confirmación Segura Enviada -->
+      <ng-container *ngIf="recuperacionEnviada">
+        <div class="text-center py-3">
+          <div class="mb-3">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+          </div>
+          <h6 class="fw-bold text-dark mb-2">Solicitud procesada con éxito</h6>
+          <p class="text-secondary small mb-3">
+            Si la dirección <strong>{{ recuperarEmail }}</strong> se encuentra registrada en el sistema, recibirás un mensaje con las instrucciones de restablecimiento de contraseña.
+          </p>
+          <div class="alert alert-light border small text-muted text-start mb-0">
+            <i class="bi bi-info-circle me-1 text-success"></i>
+            Por seguridad, ninguna credencial se visualiza en pantalla. Revisa también tu bandeja de correo no deseado o spam.
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="modal-footer-custom">
+      <button type="button" class="btn-outline-green py-2 px-4" (click)="cerrarModalOlvido()">
+        {{ recuperacionEnviada ? 'Volver al inicio de sesión' : 'Cancelar' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,2 +1,6 @@
-<app-donaciones></app-donaciones>
+@if (!estaAutenticado) {
+  <app-login (loginExitoso)="onLoginExitoso()"></app-login>
+} @else {
+  <app-donaciones (cerrarSesionEvento)="onCerrarSesion()"></app-donaciones>
+}
 <router-outlet></router-outlet>

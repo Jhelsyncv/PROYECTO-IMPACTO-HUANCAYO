@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DonacionService, Donacion } from '../../services/donacion';
@@ -20,6 +20,8 @@ export class DonacionComponente implements OnInit {
   private donacionService = inject(DonacionService);
   private comedorService = inject(ComedorService);
   private authService = inject(AuthService);
+
+  @Output() cerrarSesionEvento = new EventEmitter<void>();
 
   // Variables de Autenticación
   loginEmail = '';
@@ -119,6 +121,7 @@ export class DonacionComponente implements OnInit {
 
   cerrarSesion(): void {
     this.authService.logout();
+    this.cerrarSesionEvento.emit();
     this.mostrarNotificacion('Sesión cerrada correctamente');
   }
 
